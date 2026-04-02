@@ -19,6 +19,7 @@ b_king   = -6
 
 from smartEngine import player_one
 from dumbEngine import player_two
+from manualMove import manual_player # replace player_one or player_two with manual_player to import move manually
 
 def game_controller():
     board = [

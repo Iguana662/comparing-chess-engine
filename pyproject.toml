@@ -1,0 +1,19 @@
+[project]
+name = "comparing-chess-engine"
+version = "1.0.0"
+description = "Chess engine with Negamax + Alpha-Beta pruning — CO3061 BTL"
+requires-python = ">=3.9"
+dependencies = ["python-chess>=1.0", "customtkinter>=5.0"]
+
+[project.scripts]
+smart-engine = "chess_engine.smart_engine:main"
+dumb-engine = "chess_engine.dumb_engine:main"
+chess-tournament = "chess_engine.tournament:main"
+chess-gui = "chess_engine.gui:main"
+
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["chess_engine*"]

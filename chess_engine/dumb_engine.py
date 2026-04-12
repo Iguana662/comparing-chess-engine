@@ -23,7 +23,7 @@ class DumbEngine(UCIEngine):
     def __init__(self) -> None:
         super().__init__(name="DumbEngine", author="CO3061-Team")
 
-    def _think(self, board: chess.Board) -> chess.Move | None:
+    def _think(self, board: chess.Board, time_limit_ms: int | None = None, depth_limit: int | None = None) -> chess.Move | None:
         moves = list(board.legal_moves)
         return random.choice(moves) if moves else None
 

@@ -41,7 +41,7 @@ LEVELS: dict[int, LevelSpec] = {
     7:  LevelSpec(depth=3, quiescence=True,  eval_level=4, noise=0,  ordering=True,  time=5),
     8:  LevelSpec(depth=4, quiescence=True,  eval_level=4, noise=0,  ordering=True,  time=5),
     9:  LevelSpec(depth=4, quiescence=True,  eval_level=5, noise=0,  ordering=True,  time=5),
-    10: LevelSpec(depth=5, quiescence=True,  eval_level=5, noise=0,  ordering=True,  time=8),
+    10: LevelSpec(depth=99, quiescence=True,  eval_level=5, noise=0,  ordering=True,  time=8),
 }
 # fmt: on
 

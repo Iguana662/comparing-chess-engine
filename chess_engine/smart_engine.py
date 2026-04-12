@@ -47,7 +47,37 @@ class SmartEngine(UCIEngine):
         print("option name Skill Level type spin default 5 min 1 max 10")
 
     # -- Template Method hook -------------------------------------------
-    def _think(self, board: chess.Board) -> chess.Move | None:
+    def _think(self, board: chess.Board, time_limit_ms: int | None = None, depth_limit: int | None = None) -> chess.Move | None:
+        if time_limit_ms is not None:
+            if time_limit_ms < 100:
+                self._level = 1
+            elif time_limit_ms < 250:
+                self._level = 2
+            elif time_limit_ms < 500:
+                self._level = 3
+            elif time_limit_ms < 750:
+                self._level = 4
+            elif time_limit_ms < 1000:
+                self._level = 5
+            elif time_limit_ms < 1250:
+                self._level = 6
+            elif time_limit_ms < 1500:
+                self._level = 7
+            elif time_limit_ms < 2000:
+                self._level = 8
+            elif time_limit_ms < 2500:
+                self._level = 9
+            else:
+                self._level = 10
+            
+            self._rebuild()
+            self._search_cfg.time_limit = time_limit_ms / 1000.0
+
+        if depth_limit is not None:
+            self._search_cfg.max_depth = depth_limit
+            if time_limit_ms is None:
+                self._search_cfg.time_limit = 999999.0
+
         searcher = Searcher(self._evaluator, self._search_cfg)
         move = searcher.search(board)
         # Send UCI info so the GUI can read live stats

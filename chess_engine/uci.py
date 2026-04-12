@@ -25,7 +25,7 @@ class UCIEngine(ABC):
     #  Template hooks (subclasses override)
     # ------------------------------------------------------------------
     @abstractmethod
-    def _think(self, board: chess.Board) -> chess.Move | None:
+    def _think(self, board: chess.Board, time_limit_ms: int | None = None, depth_limit: int | None = None) -> chess.Move | None:
         """Select a move for the current position."""
 
     def _on_setoption(self, name: str, value: str) -> None:
@@ -56,7 +56,7 @@ class UCIEngine(ABC):
             elif line.startswith("position"):
                 self._cmd_position(line)
             elif line.startswith("go"):
-                self._cmd_go()
+                self._cmd_go(line)
             elif line.startswith("setoption"):
                 self._cmd_setoption(line)
             elif line == "quit":
@@ -90,8 +90,27 @@ class UCIEngine(ABC):
             for m in parts[idx + 1 :]:
                 self._board.push_uci(m)
 
-    def _cmd_go(self) -> None:
-        move = self._think(self._board)
+    def _cmd_go(self, line: str) -> None:
+        parts = line.split()
+        time_limit_ms = None
+        depth_limit = None
+        try:
+            if "depth" in parts:
+                idx = parts.index("depth")
+                depth_limit = int(parts[idx + 1])
+                
+            if "movetime" in parts:
+                idx = parts.index("movetime")
+                time_limit_ms = int(parts[idx + 1])
+            elif "wtime" in parts and "btime" in parts:
+                wtime = int(parts[parts.index("wtime") + 1])
+                btime = int(parts[parts.index("btime") + 1])
+                my_time = wtime if self._board.turn == chess.WHITE else btime
+                time_limit_ms = max(50, int(my_time / 40))
+        except (ValueError, IndexError):
+            pass
+
+        move = self._think(self._board, time_limit_ms, depth_limit)
         if move is not None:
             print(f"bestmove {move.uci()}")
         else:

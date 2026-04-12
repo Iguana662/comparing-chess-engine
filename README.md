@@ -67,7 +67,7 @@ The data flows roughly like this: `levels.py` defines what search depth and eval
 
 ### 3.1. Prerequisites
 
-- **Python** 3.9 or later
+- **Python** from 3.9 to 3.12 (some newer py does not support pygame)
 - **python-chess** 1.0 or later — provides chess rules, legal move generation, and UCI protocol support
 - **customtkinter** 5.0 or later — provides the graphical user interface
 

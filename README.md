@@ -1,7 +1,7 @@
 # Comparing Chess Engine
 
-> **CO3061 — Introduction to Artificial Intelligence**
-> **Semester 252 — Academic Year 2025-2026**
+> **CO3061 — Introduction to Artificial Intelligence**   
+> **Semester 252 — Academic Year 2025-2026**    
 > Ho Chi Minh City University of Technology (HCMUT)
 
 ## Table of Contents
@@ -209,7 +209,7 @@ The most fundamental aspect of any chess position is _how much material each sid
 | Rook   | 500        |
 | Queen  | 900        |
 
-The score is $\text{White material} - \text{Black material}$. Being up a single pawn ($+100$ cp) is a meaningful advantage; being up a rook ($+500$ cp) is usually decisive.
+The score is $\\textit{White material} - \\textit{Black material}$. Being up a single pawn ($+100$ cp) is a meaningful advantage; being up a rook ($+500$ cp) is usually decisive.
 
 ### 5.2. Positional Evaluation (Piece-Square Tables)
 
@@ -225,7 +225,7 @@ All tables are stored from White's perspective. For Black, the engine mirrors th
 
 A player with more legal moves generally has more flexibility: more squares controlled, more tactical options, and a more active position overall. The mobility evaluator counts the legal moves for each side and returns:
 
-$$\text{mobility\_score} = (\text{white\_legal\_moves} - \text{black\_legal\_moves}) \times 10$$
+$$\textit{mobility} = (\textit{white moves} - \textit{black moves}) \times 10$$
 
 This rewards piece activity and penalises cramped positions where pieces are blocked or pinned.
 
@@ -246,7 +246,7 @@ The total danger score is multiplied by $15$ and converted into a centipawn pena
 
 Rather than having the search call each evaluator individually, a `CompositeEvaluator` bundles all active components into a single object that returns one aggregate score:
 
-$$\text{score} = \text{material} + \text{positional} + \text{mobility} + \text{king\_safety} + \text{random}(-\text{noise},\; +\text{noise})$$
+$$\textit{score} = \textit{material} + \textit{positional} + \textit{mobility} + \textit{king safety} + \textit{random}(-\textit{noise},\; +\textit{noise})$$
 
 The noise term is a deliberate imperfection. At lower skill levels, random perturbation of up to $\pm 50$ cp is added to the evaluation, causing the engine to occasionally misjudge positions and make suboptimal moves. This is the primary mechanism for creating weaker play at low levels. At level 6 and above, noise is zero.
 
@@ -265,9 +265,9 @@ After this check, the raw score (which is computed from White's perspective) is 
 
 Alpha-Beta pruning works best when strong moves are tried first — more branches get cut and the search runs faster. To achieve this, the engine scores every legal move with a heuristic and sorts them in descending order before the search begins. Three heuristics are used:
 
-**MVV-LVA (Most Valuable Victim - Least Valuable Aggressor)** scores capture moves by prioritising captures of high-value pieces by low-value pieces. The formula is $(\text{victim\_score} + \text{attacker\_bonus}) \times 100$. For example, a pawn capturing a queen scores $55$, while a queen capturing a pawn scores only $11$ — so the pawn-takes-queen is examined first. This simple heuristic dramatically improves pruning without any expensive computation.
+**MVV-LVA (Most Valuable Victim - Least Valuable Aggressor)** scores capture moves by prioritising captures of high-value pieces by low-value pieces. The formula is $(\textit{victim} + \textit{attacker bonus}) \times 100$. For example, a pawn capturing a queen scores $55$, while a queen capturing a pawn scores only $11$ — so the pawn-takes-queen is examined first. This simple heuristic dramatically improves pruning without any expensive computation.
 
-**Promotion bonus** adds $\text{promoted\_piece\_value} \times 10$ to moves that promote a pawn, since promotion (especially to a queen) almost always represents a major material gain.
+**Promotion bonus** adds $\textit{promoted piece value} \times 10$ to moves that promote a pawn, since promotion (especially to a queen) almost always represents a major material gain.
 
 **Check bonus** adds $+300$ to moves that put the opponent's king in check. Checks are forcing moves that constrain the opponent's options, so they tend to be tactically important. This bonus is only enabled at skill level 9 and above, as it requires pushing and popping each move to detect the check — a measurable cost.
 

@@ -1,7 +1,7 @@
 # Comparing Chess Engine
 
-> **CO3061 — Introduction to Artificial Intelligence**   
-> **Semester 252 — Academic Year 2025-2026**    
+> **CO3061 — Introduction to Artificial Intelligence**  
+> **Semester 252 — Academic Year 2025-2026**  
 > Ho Chi Minh City University of Technology (HCMUT)
 
 ## Table of Contents
@@ -90,7 +90,7 @@ python -m chess_engine.gui --level 8          # Set a specific skill level
 python -m chess_engine.gui --flip             # Smart plays White instead
 ```
 
-**Tournament** — run multiple matches and collect win/draw/loss statistics:
+**Tournament** — run multiple matches and collect win/draw/loss statistics (games are terminated early if 300 moves are exceeded, a draw can be claimed, or the material imbalance reaches ≥ 500 cp after move 20):
 
 ```bash
 python -m chess_engine.tournament --mode tournament --level 5 --matches 10
@@ -209,7 +209,7 @@ The most fundamental aspect of any chess position is _how much material each sid
 | Rook   | 500        |
 | Queen  | 900        |
 
-The score is $\\textit{White material} - \\textit{Black material}$. Being up a single pawn ($+100$ cp) is a meaningful advantage; being up a rook ($+500$ cp) is usually decisive.
+The score is $\text{White material} - \text{Black material}$. Being up a single pawn ($+100$ cp) is a meaningful advantage; being up a rook ($+500$ cp) is usually decisive.
 
 ### 5.2. Positional Evaluation (Piece-Square Tables)
 
@@ -225,7 +225,7 @@ All tables are stored from White's perspective. For Black, the engine mirrors th
 
 A player with more legal moves generally has more flexibility: more squares controlled, more tactical options, and a more active position overall. The mobility evaluator counts the legal moves for each side and returns:
 
-$$\textit{mobility} = (\textit{white moves} - \textit{black moves}) \times 10$$
+$$\text{mobility} = (\text{white moves} - \text{black moves}) \times 10$$
 
 This rewards piece activity and penalises cramped positions where pieces are blocked or pinned.
 
@@ -246,7 +246,7 @@ The total danger score is multiplied by $15$ and converted into a centipawn pena
 
 Rather than having the search call each evaluator individually, a `CompositeEvaluator` bundles all active components into a single object that returns one aggregate score:
 
-$$\textit{score} = \textit{material} + \textit{positional} + \textit{mobility} + \textit{king safety} + \textit{random}(-\textit{noise},\; +\textit{noise})$$
+$$\text{score} = \text{material} + \text{positional} + \text{mobility} + \text{king safety} + \text{random}(-\text{noise},\; +\text{noise})$$
 
 The noise term is a deliberate imperfection. At lower skill levels, random perturbation of up to $\pm 50$ cp is added to the evaluation, causing the engine to occasionally misjudge positions and make suboptimal moves. This is the primary mechanism for creating weaker play at low levels. At level 6 and above, noise is zero.
 
@@ -265,9 +265,9 @@ After this check, the raw score (which is computed from White's perspective) is 
 
 Alpha-Beta pruning works best when strong moves are tried first — more branches get cut and the search runs faster. To achieve this, the engine scores every legal move with a heuristic and sorts them in descending order before the search begins. Three heuristics are used:
 
-**MVV-LVA (Most Valuable Victim - Least Valuable Aggressor)** scores capture moves by prioritising captures of high-value pieces by low-value pieces. The formula is $(\textit{victim} + \textit{attacker bonus}) \times 100$. For example, a pawn capturing a queen scores $55$, while a queen capturing a pawn scores only $11$ — so the pawn-takes-queen is examined first. This simple heuristic dramatically improves pruning without any expensive computation.
+**MVV-LVA (Most Valuable Victim - Least Valuable Aggressor)** scores capture moves by prioritising captures of high-value pieces by low-value pieces. The formula is $(\text{victim} + \text{attacker bonus}) \times 100$. For example, a pawn capturing a queen scores $(50 + 5) \times 100 = 5{,}500$, while a queen capturing a pawn scores only $(10 + 1) \times 100 = 1{,}100$ — so the pawn-takes-queen is examined first. This simple heuristic dramatically improves pruning without any expensive computation.
 
-**Promotion bonus** adds $\textit{promoted piece value} \times 10$ to moves that promote a pawn, since promotion (especially to a queen) almost always represents a major material gain.
+**Promotion bonus** adds $\text{promoted piece value} \times 10$ to moves that promote a pawn, since promotion (especially to a queen) almost always represents a major material gain.
 
 **Check bonus** adds $+300$ to moves that put the opponent's king in check. Checks are forcing moves that constrain the opponent's options, so they tend to be tactically important. This bonus is only enabled at skill level 9 and above, as it requires pushing and popping each move to detect the check — a measurable cost.
 
@@ -350,6 +350,8 @@ The graphical interface provides a visual way to watch the two engines play agai
 The left side of the window shows a 592x592 pixel chessboard rendered with Unicode piece glyphs. The last move is highlighted in blue, and the king's square turns red when in check. Above and below the board, player bars display each engine's name, captured pieces, and material advantage.
 
 The right side is an information panel. At the top, a configuration row lets the user select the skill level (1 through 10) and choose which side the Smart Engine plays (White or Black) — these controls are locked once a game starts. Below that, a real-time evaluation bar shows which side currently has the advantage, followed by an algorithm info card that displays which search features and evaluation components are active for the selected level. A live statistics section updates after every Smart Engine move, showing the search depth reached, the evaluation score in centipawns, the number of nodes visited, and the thinking time. A scrollable move log in standard algebraic notation records the full game history, and Start/Pause and Reset buttons control the game flow.
+
+![Chess Engine GUI — Smart Engine (White, Level 10) vs Dumb Engine](figs/gui_screenshot.png)
 
 ```bash
 python -m chess_engine.gui --level 7 --flip

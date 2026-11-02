@@ -1,10 +1,9 @@
-"""Smart chess engine — Negamax + Alpha-Beta with configurable skill levels.
 
-Extends ``UCIEngine`` (Template Method) — overrides ``_think()`` to use
-the ``Searcher`` with a level-dependent ``CompositeEvaluator``.
+"""Smart chess engine using Negamax and Alpha-Beta pruning.
 
-Run directly::
+Uses the existing UCIEngine interface and the TV1 search contract.
 
+Run:
     python -m chess_engine.smart_engine
 """
 
@@ -14,20 +13,29 @@ import sys
 
 import chess
 
-from chess_engine.levels import LEVELS, build_evaluator, build_search_config
+from chess_engine.contracts import SearchLimits
+from chess_engine.levels import (
+    LEVELS,
+    build_evaluator,
+    build_search_config,
+)
 from chess_engine.search import Searcher
 from chess_engine.uci import UCIEngine
 
 
 class SmartEngine(UCIEngine):
-    """UCI engine backed by Negamax search and composite evaluation."""
+    """UCI engine backed by Alpha-Beta search."""
 
     def __init__(self) -> None:
-        super().__init__(name="SmartEngine", author="CO3061-Team")
+        super().__init__(
+            name="SmartEngine",
+            author="CO3061-Team",
+        )
         self._level = 5
         self._rebuild()
 
-    # -- configuration --------------------------------------------------
+    # -- Configuration -----------------------------------------
+
     def _rebuild(self) -> None:
         spec = LEVELS[self._level]
         self._evaluator = build_evaluator(spec)
@@ -44,19 +52,46 @@ class SmartEngine(UCIEngine):
         self._rebuild()
 
     def _print_options(self) -> None:
-        print("option name Skill Level type spin default 5 min 1 max 10")
-
-    # -- Template Method hook -------------------------------------------
-    def _think(self, board: chess.Board) -> chess.Move | None:
-        searcher = Searcher(self._evaluator, self._search_cfg)
-        move = searcher.search(board)
-        # Send UCI info so the GUI can read live stats
-        s = searcher.last_stats
         print(
-            f"info depth {s.depth} score cp {s.score} "
-            f"nodes {s.nodes} time {s.time_ms}"
+            "option name Skill Level "
+            "type spin default 5 min 1 max 10"
         )
+
+    # -- Alpha-Beta search -------------------------------------
+
+    def _think(
+        self,
+        board: chess.Board,
+    ) -> chess.Move | None:
+
+        searcher = Searcher(
+            self._evaluator,
+            self._search_cfg,
+        )
+
+        # Temporary compatibility with existing UCIEngine.
+        # TV4 will integrate external go movetime later.
+        limits = SearchLimits(
+            time_ms=max(
+                1,
+                int(self._search_cfg.time_limit * 1000),
+            )
+        )
+
+        result = searcher.search(board, limits)
+        move = result.move
+        stats = result.stats
+
+        # Standard UCI search statistics.
+        print(
+            f"info depth {stats.depth or 0} "
+            f"score cp {stats.score_cp or 0} "
+            f"nodes {stats.nodes or 0} "
+            f"time {stats.elapsed_ms}"
+        )
+
         sys.stdout.flush()
+
         return move
 
 

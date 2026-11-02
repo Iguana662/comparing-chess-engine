@@ -67,3 +67,34 @@ def build_search_config(spec: LevelSpec) -> SearchConfig:
         check_bonus=(spec.eval_level >= 5),
         time_limit=spec.time,
     )
+
+
+
+# ============================================================
+# TV1 - Fixed Alpha-Beta Benchmark Configuration
+# ============================================================
+
+def build_benchmark_evaluator() -> Evaluator:
+    """Build a deterministic evaluator for AB vs MCTS benchmarks."""
+    return CompositeEvaluator(
+        strategies=[
+            MaterialEvaluator(),
+            PositionalEvaluator(),
+            MobilityEvaluator(),
+            KingSafetyEvaluator(),
+        ],
+        noise=0,
+    )
+
+
+def build_benchmark_config() -> SearchConfig:
+    """Build the fixed Alpha-Beta benchmark configuration."""
+    return SearchConfig(
+        max_depth=64,
+        use_quiescence=True,
+        use_ordering=True,
+        check_bonus=True,
+        time_limit=1.0,
+    )
+
+
